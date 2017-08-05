@@ -1,5 +1,6 @@
-require "hangman/version"
+require_relative "./hangman/version"
+require_relative "./hangman/game.rb"
 
 module Hangman
-  # Your code goes here...
+  Hangman::Game.new.play
 end

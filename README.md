@@ -1,3 +1,35 @@
+## GOALS
+
+When a new game is started script should load dictionary and randomly select a word between 5 and 12 characters long for the secret word.
+
+when new game is created.
+
+read in file
+1 word per line so readlines will create an array of words.
+sort array
+remove words over 12 characters
+remove words with less than 5 characters
+select word at random from array and set to secret word
+
+Display which letters have been succesfully chosen and those which are unsuccesful.
+
+solicit guesses - capture user input
+
+compare guess string to secret word using contain?
+
+
+
+Display how many guesses the player has left, the player will lose if out of guesses.
+
+every turn the player can make a guess of a letter, it should be case insensitive.
+
+at the start of every turn instead of making a guess the player should have the option to save the game.
+
+when the program first loads the player should have the options to load a saved game.
+
+
+
+
 # Hangman
 
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/hangman`. To experiment with that code, run `bin/console` for an interactive prompt.
