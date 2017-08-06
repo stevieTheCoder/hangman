@@ -3,90 +3,110 @@ module Hangman
 	require "yaml"
 
 	class Game
+
 		attr_accessor :secret_word, :guess_count, :guess, :current_guesses, :previous_guesses
+
 		def initialize
 			@secret_word = secret_word_setter
 			@guess_count = 0
 			@guess = guess
-			@current_guesses = initial_construct
+			@current_guesses = initial_board_construct
 			@previous_guesses = []
-		end
-
-		def load_game
-			YAML.load_file("./lib/hangman/save_files/hangman.yml").play
-		end
-
-		def load_game_message
-			"The last game save has been loaded"
-		end
-
-		def new_game_message
-			"A secret word has been created, you have 10 attempts to guess the word"
 		end
 
 		def start
 			puts "\n######################\n# Welcome to Hangman #\n######################\n"
+			puts %Q{
+        ____
+       |/   |
+       |    O
+       |   /|\\
+       |    |
+       |   / \\
+   ____|____    
+		}
 			puts "\nYou can save the game at any time by typing 'save'"
-			puts "\nWould you like to load a previous game? (Y/N)"
+			puts "\nWould you like to load the previous game save? (Y/N)"
 
 			load_game_response = capture_user_input
 
 			if load_game_response.upcase == "Y"
-				puts load_game_message
+				load_game_message
 				load_game
 			else 
-				puts new_game_message
-				puts initial_construct.join
+				new_game_message
 				play
 			end
 		end
 
 		def play
 			while true
-				puts ""
-				puts number_of_guesses_remaining
-				puts ""
-				puts guess_feedback.join
-				puts solicit_move
+				show_hangman
+				display_board
+				number_of_guesses_remaining_message
+				previous_guesses_feedback_message
+				solicit_move_message
+
 				@guess = capture_user_input
+
 				if guess == "save"
 					save_game
-					puts save_message
+					save_message
 					return false
 				end
-				puts ""
-				puts guess_feedback.join
-				puts ""
-				puts "you have made the following guesses so far: #{construct_previous_guesses.join(" ")}"
-				guess_counter
+
+				update_board
+				update_previous_guesses
+				update_guess_counter
+
 				if game_over
-					puts game_over_message
+					game_over_message
 					return false
 				end
 			end
 		end
 
-		def solicit_move
-			"Please type a letter and press enter to make a guess"
-		end
-
-		def capture_user_input(input = gets.chomp)
-			input
+		def load_game
+			YAML.load_file("./lib/hangman/save_files/hangman.yml").play
 		end
 
 		def save_game
 			File.open("./lib/hangman/save_files/hangman.yml", 'w') { |f| YAML.dump(self, f) }
 		end
 
-		def save_message
-			"File saved, now closing the game"
+		def load_game_message
+			puts "\nThe last game save has been loaded."
 		end
 
-		def guess_counter
+		def new_game_message
+			puts "\nA random word has been created for you to guess.\n\nThe word is #{secret_word.length} letters in length."
+		end
+
+		def save_message
+			puts "\nFile saved, now closing the game."
+		end
+
+		def number_of_guesses_remaining_message
+			puts "\nYou have #{10 - guess_count} guesses remaining."
+		end
+
+		def solicit_move_message
+			puts "\nPlease type a letter or guess the word and then press enter."
+		end
+
+		def previous_guesses_feedback_message
+			puts "\nYou have made the following guesses: #{previous_guesses.join(', ')}" unless previous_guesses.empty?
+		end
+
+		def capture_user_input(input = gets.chomp)
+			input.downcase
+		end
+
+		def update_guess_counter
 			@guess_count += 1 unless secret_word.include? guess || @guess = "save"
 		end
 
-		def guess_feedback
+		def update_board
 			result = []
 			current_guesses.each_with_index do |char, index|
 				if secret_word[index] == guess
@@ -96,20 +116,19 @@ module Hangman
 				end
 			end
 			@current_guesses = result
-			current_guesses
 		end
 
-		def construct_previous_guesses
+		def display_board
+			puts ""
+			puts current_guesses.join
+		end
+
+		def update_previous_guesses
 			if previous_guesses.include? guess
 				previous_guesses
 			else
 				@previous_guesses << guess
 			end
-			previous_guesses
-		end
-
-		def number_of_guesses_remaining
-			"You have #{10 - guess_count} guesses remaining"
 		end
 
 		def dictionary_location
@@ -129,7 +148,7 @@ module Hangman
 			words_between_5_and_12_characters.sample.chars
 		end
 
-		def initial_construct
+		def initial_board_construct
 			Array.new(secret_word.length) {"_"}
 		end
 
@@ -140,11 +159,12 @@ module Hangman
 		end
 
 		def game_over_message
-			return "You win!" if game_over == :winner
-			return "You have run out of guesses, you lose!" if game_over == :lose
+			puts "You have correctly guessed the word: #{secret_word.join}, you win!" if game_over == :winner
+			puts "You have run out of guesses, you lose!" if game_over == :lose
 		end
 
 		def winner?
+			return true if guess == secret_word.join
 			return false if current_guesses.include?("_")
 			true
 		end
@@ -152,6 +172,123 @@ module Hangman
 		def lose?
 			return true if guess_count == 10
 			false
+		end
+
+		def show_hangman
+		case guess_count
+			when 0
+				puts %Q{
+		        
+
+
+
+
+
+		   ____|____    
+				  }
+			  when 1
+			  	puts %Q{
+		        
+		       |
+		       |
+		       |   
+		       |    
+		       |   
+		   ____|____    
+				}
+			  when 2
+					puts %Q{
+		        ____
+		       |/   
+		       |
+		       |
+		       |    
+		       |   
+		   ____|____    
+				}
+			  when 3
+					puts %Q{
+		        ____
+		       |/   |
+		       |
+		       |
+		       |
+		       |    
+		   ____|____    
+				}
+			  when 4
+					puts %Q{
+		        ____
+		       |/   |
+		       |    O
+		       |
+		       |
+		       |   
+		   ____|____    
+				}
+			  when 5
+					puts %Q{
+		        ____
+		       |/   |
+		       |    O
+		       |    |
+		       |
+		       |   
+		   ____|____    
+				}
+			  when 6
+					puts %Q{
+		        ____
+		       |/   |
+		       |    O
+		       |    |
+		       |    |
+		       |
+		   ____|____    
+				}
+
+				when 7
+					puts %Q{
+		        ____
+		       |/   |
+		       |    O
+		       |   /|
+		       |    |
+		       |   
+		   ____|____    
+				}
+			  when 8
+					puts %Q{
+		        ____
+		       |/   |
+		       |    O
+		       |   /|\\
+		       |    |
+		       |
+		   ____|____    
+				}
+
+			  when 9
+					puts %Q{
+		        ____
+		       |/   |
+		       |    O
+		       |   /|\\
+		       |    |
+		       |   /
+		   ____|____    
+				}
+			  when 10
+					puts %Q{
+		        ____
+		       |/   |
+		       |    O
+		       |   /|\\
+		       |    |
+		       |   / \\
+		   ____|____    
+				}
+	  		end
 		end
 	end
 end
