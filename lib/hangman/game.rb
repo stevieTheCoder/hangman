@@ -12,13 +12,41 @@ module Hangman
 			@previous_guesses = []
 		end
 
+		def load_game
+			YAML.load_file("./lib/hangman/save_files/hangman.yml").play
+		end
+
+		def load_game_message
+			"The last game save has been loaded"
+		end
+
+		def new_game_message
+			"A secret word has been created, you have 10 attempts to guess the word"
+		end
+
+		def start
+			puts "\n######################\n# Welcome to Hangman #\n######################\n"
+			puts "\nYou can save the game at any time by typing 'save'"
+			puts "\nWould you like to load a previous game? (Y/N)"
+
+			load_game_response = capture_user_input
+
+			if load_game_response.upcase == "Y"
+				puts load_game_message
+				load_game
+			else 
+				puts new_game_message
+				puts initial_construct.join
+				play
+			end
+		end
+
 		def play
-			puts "Welcome to Hangman"
-			puts ""
-			puts "A secret word has been created, you have 10 attempts to guess the word"
-			puts initial_construct.join
 			while true
 				puts ""
+				puts number_of_guesses_remaining
+				puts ""
+				puts guess_feedback.join
 				puts solicit_move
 				@guess = capture_user_input
 				if guess == "save"
@@ -31,7 +59,6 @@ module Hangman
 				puts ""
 				puts "you have made the following guesses so far: #{construct_previous_guesses.join(" ")}"
 				guess_counter
-				puts number_of_guesses_remaining
 				if game_over
 					puts game_over_message
 					return false
@@ -48,7 +75,7 @@ module Hangman
 		end
 
 		def save_game
-			File.open("./lib/hangman/save_files/hangman.yml", 'w') { |f| YAML.dump([] << self, f) }
+			File.open("./lib/hangman/save_files/hangman.yml", 'w') { |f| YAML.dump(self, f) }
 		end
 
 		def save_message
