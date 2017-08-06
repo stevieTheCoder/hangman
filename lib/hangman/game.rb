@@ -21,7 +21,11 @@ module Hangman
 				puts ""
 				puts solicit_move
 				@guess = capture_user_input
-				save_game
+				if guess == "save"
+					save_game
+					puts save_message
+					return false
+				end
 				puts ""
 				puts guess_feedback.join
 				puts ""
@@ -44,18 +48,15 @@ module Hangman
 		end
 
 		def save_game
-			if @guess = "save"
-				#code to save game
-			else
-				#figure it out
+			File.open("./lib/hangman/save_files/hangman.yml", 'w') { |f| YAML.dump([] << self, f) }
+		end
+
+		def save_message
+			"File saved, now closing the game"
 		end
 
 		def guess_counter
-			@guess_count += 1 unless secret_word.include? guess
-		end
-
-		def save_file
-			file.open("./lib/hangman/save_file.yml", 'w') { |file| file.write(YAML.dump())}
+			@guess_count += 1 unless secret_word.include? guess || @guess = "save"
 		end
 
 		def guess_feedback
