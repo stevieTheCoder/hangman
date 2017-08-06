@@ -1,27 +1,26 @@
 --- !ruby/object:Hangman::Game
 secret_word:
-- G
+- c
 - o
-- l
-- d
-- b
-- e
+- n
+- t
 - r
-- g
-guess_count: 3
+- i
+- t
+- e
+- l
+- y
+guess_count: 0
 guess: save
 current_guesses:
 - _
-- o
 - _
 - _
 - _
-- e
 - _
 - _
-previous_guesses:
-- a
-- e
-- i
-- o
-- u
+- _
+- _
+- _
+- _
+previous_guesses: []
